@@ -1,4 +1,4 @@
-# WiFi Authentication System
+# Wifi authenticator for education in java
 
 This project is a simple WiFi authentication system using Java Swing for the user interface. It allows users to log in using a username and password, with credentials stored in a text file.
 
