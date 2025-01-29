@@ -12,8 +12,7 @@ public class WifiLoginGUI {
     private JLabel statusLabel;
     private JLabel usernameLabel;
     private JLabel passwordLabel;
-    private static final File CREDENTIALS_FILE = new File("/Users/jaifha_wongkunta/Documents/wuttikan/CafeWifiSystem/wifi_user.txt");
-    // private static final File CREDENTIALS_FILE = new File("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\wifi_user.txt");
+    private static final File CREDENTIALS_FILE = new File("");
 
     public WifiLoginGUI() {
         frame = new JFrame("Wifi authentication");
@@ -21,8 +20,10 @@ public class WifiLoginGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
 
-        Font montserratFont = loadFont("/Users/jaifha_wongkunta/Documents/wuttikan/CafeWifiSystem/font/Montserrat-Regular.ttf", 14);
-        // Font montserratFont = loadFont("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\font\\Montserrat-Regular.ttf", 14);
+        Font montserratFont = loadFont("", 14);
+
+        ImageIcon logoIcon = new ImageIcon("logo/resizelogo.jpg");
+        frame.setIconImage(logoIcon.getImage());
 
         ImageIcon originalIcon = new ImageIcon("logo/LOGO.png");
         Image resizedImage = originalIcon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
@@ -38,6 +39,7 @@ public class WifiLoginGUI {
 
         usernameField = new JTextField("");
         usernameField.setBounds(50, 290, 340, 42);
+        usernameField.setFont(montserratFont);
         usernameField.setMargin(new Insets(0, 10, 0, 0));
         usernameField.setOpaque(true);
         usernameField.setBorder(createRoundedBorder(15));
@@ -50,6 +52,7 @@ public class WifiLoginGUI {
 
         passwordField = new JPasswordField("");
         passwordField.setBounds(50, 360, 340, 42);
+        passwordField.setFont(montserratFont);
         passwordField.setMargin(new Insets(0, 10, 0, 0));
         passwordField.setOpaque(true);
         passwordField.setBorder(createRoundedBorder(15));
@@ -123,7 +126,7 @@ public class WifiLoginGUI {
 
         if (validateCredentials(username, password)) {
             statusLabel.setText("You're logged in!");
-            statusLabel.setBackground(new Color(59, 48, 38));
+            statusLabel.setForeground(new Color(59, 48, 38));
             statusLabel.setBounds(155, 405, 350, 42);
         } else {
             statusLabel.setText("Wrong username or password!");
