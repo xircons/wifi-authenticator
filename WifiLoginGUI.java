@@ -12,17 +12,19 @@ public class WifiLoginGUI {
     private JLabel statusLabel;
     private JLabel usernameLabel;
     private JLabel passwordLabel;
-    private static final File CREDENTIALS_FILE = new File("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\wifi_user.txt");
+    private static final File CREDENTIALS_FILE = new File("/Users/jaifha_wongkunta/Documents/wuttikan/CafeWifiSystem/wifi_user.txt");
+    // private static final File CREDENTIALS_FILE = new File("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\wifi_user.txt");
 
     public WifiLoginGUI() {
-        frame = new JFrame("WiFi Login");
+        frame = new JFrame("Wifi authentication");
         frame.setSize(450, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
 
-        Font montserratFont = loadFont("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\font\\Montserrat-Regular.ttf", 14);
+        Font montserratFont = loadFont("/Users/jaifha_wongkunta/Documents/wuttikan/CafeWifiSystem/font/Montserrat-Regular.ttf", 14);
+        // Font montserratFont = loadFont("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\font\\Montserrat-Regular.ttf", 14);
 
-        ImageIcon originalIcon = new ImageIcon("LOGO.png");
+        ImageIcon originalIcon = new ImageIcon("logo/LOGO.png");
         Image resizedImage = originalIcon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
         JLabel label = new JLabel(resizedIcon);
@@ -53,9 +55,7 @@ public class WifiLoginGUI {
         passwordField.setBorder(createRoundedBorder(15));
         frame.add(passwordField);
 
-        JButton loginButton = new JButton("Login") {
-            private final boolean[] hover = {false}; // Use an array to store hover state
-        
+        JButton loginButton = new JButton("Login") {        
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
