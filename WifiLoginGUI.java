@@ -12,7 +12,14 @@ public class WifiLoginGUI {
     private JLabel statusLabel;
     private JLabel usernameLabel;
     private JLabel passwordLabel;
-    private static final File CREDENTIALS_FILE = new File("");
+    private JLabel loggedInLabel;
+    private JLabel countdownLabel;
+    private JButton loginButton;
+    private javax.swing.Timer countdownTimer;
+    private long remainingSeconds;
+    private String loggedInUsername;
+    private Font montserratFont;
+    private static final File CREDENTIALS_FILE = new File("wifi_user.txt");
 
     public WifiLoginGUI() {
         frame = new JFrame("Wifi authentication");
@@ -20,7 +27,7 @@ public class WifiLoginGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
 
-        Font montserratFont = loadFont("", 14);
+        montserratFont = loadFont("font/Montserrat-Regular.ttf", 14);
 
         ImageIcon logoIcon = new ImageIcon("logo/resizelogo.jpg");
         frame.setIconImage(logoIcon.getImage());
@@ -56,9 +63,11 @@ public class WifiLoginGUI {
         passwordField.setMargin(new Insets(0, 10, 0, 0));
         passwordField.setOpaque(true);
         passwordField.setBorder(createRoundedBorder(15));
+        // Configure password masking with a font-compatible bullet
+        configurePasswordEchoChar();
         frame.add(passwordField);
 
-        JButton loginButton = new JButton("Login") {        
+        loginButton = new JButton("Login") {        
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -84,8 +93,46 @@ public class WifiLoginGUI {
         statusLabel.setFont(montserratFont);
         frame.add(statusLabel);
 
+        // Post-login UI elements (initially not visible)
+        loggedInLabel = new JLabel("");
+        loggedInLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        loggedInLabel.setFont(montserratFont.deriveFont(18f));
+        loggedInLabel.setForeground(new Color(59, 48, 38));
+        loggedInLabel.setBounds(0, 300, 450, 40);
+        loggedInLabel.setVisible(false);
+        frame.add(loggedInLabel);
+
+        countdownLabel = new JLabel("");
+        countdownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        countdownLabel.setFont(montserratFont.deriveFont(24f));
+        countdownLabel.setForeground(new Color(59, 48, 38));
+        countdownLabel.setBounds(0, 340, 450, 40);
+        countdownLabel.setVisible(false);
+        frame.add(countdownLabel);
+
         loginButton.addActionListener(this::checkLogin);
         frame.setVisible(true);
+    }
+
+    private void configurePasswordEchoChar() {
+        // Prefer standard bullet '•' (U+2022). Fallback to black circle '●' (U+25CF) or LAF default, then '*'.
+        char bullet = '\u2022';
+        char blackCircle = '\u25CF';
+
+        if (montserratFont != null && montserratFont.canDisplay(bullet)) {
+            passwordField.setEchoChar(bullet);
+            return;
+        }
+        if (montserratFont != null && montserratFont.canDisplay(blackCircle)) {
+            passwordField.setEchoChar(blackCircle);
+            return;
+        }
+        Object lafEcho = UIManager.get("PasswordField.echoChar");
+        if (lafEcho instanceof Character) {
+            passwordField.setEchoChar((Character) lafEcho);
+            return;
+        }
+        passwordField.setEchoChar('*');
     }
 
     private Font loadFont(String path, float size) {
@@ -94,7 +141,7 @@ public class WifiLoginGUI {
             return font.deriveFont(size);
         } catch (Exception e) {
             e.printStackTrace();
-            return new Font("SansSerif", Font.PLAIN, 18);
+            return new Font("Roboto", Font.PLAIN, 14);
         }
     }
 
@@ -125,14 +172,76 @@ public class WifiLoginGUI {
         String password = new String(passwordField.getPassword());
 
         if (validateCredentials(username, password)) {
-            statusLabel.setText("You're logged in!");
-            statusLabel.setForeground(new Color(59, 48, 38));
-            statusLabel.setBounds(155, 405, 350, 42);
+            loggedInUsername = username;
+            statusLabel.setText("");
+            showMainPage();
         } else {
             statusLabel.setText("Wrong username or password!");
             statusLabel.setForeground(Color.RED);
             statusLabel.setBounds(115, 405, 350, 42);
         }
+    }
+
+    private void showMainPage() {
+        // Hide login controls
+        usernameLabel.setVisible(false);
+        usernameField.setVisible(false);
+        passwordLabel.setVisible(false);
+        passwordField.setVisible(false);
+        loginButton.setVisible(false);
+
+        // Show main page labels
+        loggedInLabel.setText("Username: " + loggedInUsername);
+        loggedInLabel.setVisible(true);
+        countdownLabel.setVisible(true);
+
+        startCountdown(3600); // 1 hour
+    }
+
+    private void startCountdown(int totalSeconds) {
+        if (countdownTimer != null) {
+            countdownTimer.stop();
+        }
+        remainingSeconds = totalSeconds;
+        countdownLabel.setText("Time remaining: " + formatDuration(remainingSeconds));
+
+        countdownTimer = new javax.swing.Timer(1000, ae -> {
+            remainingSeconds--;
+            if (remainingSeconds <= 0) {
+                countdownLabel.setText("Time expired. Please login again.");
+                ((javax.swing.Timer) ae.getSource()).stop();
+                SwingUtilities.invokeLater(this::resetToLogin);
+            } else {
+                countdownLabel.setText("Time remaining: " + formatDuration(remainingSeconds));
+            }
+        });
+        countdownTimer.start();
+    }
+
+    private void resetToLogin() {
+        // Hide main page UI
+        loggedInLabel.setVisible(false);
+        countdownLabel.setVisible(false);
+
+        // Show login controls again
+        usernameLabel.setVisible(true);
+        usernameField.setVisible(true);
+        passwordLabel.setVisible(true);
+        passwordField.setVisible(true);
+        loginButton.setVisible(true);
+
+        usernameField.setText("");
+        passwordField.setText("");
+        statusLabel.setText("Session expired. Please login again.");
+        statusLabel.setForeground(Color.RED);
+        statusLabel.setBounds(95, 405, 350, 42);
+    }
+
+    private String formatDuration(long seconds) {
+        long hrs = seconds / 3600;
+        long mins = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+        return String.format("%02d:%02d:%02d", hrs, mins, secs);
     }
 
     private boolean validateCredentials(String username, String password) {
