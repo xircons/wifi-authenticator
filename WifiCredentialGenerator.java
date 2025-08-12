@@ -2,8 +2,7 @@ import java.io.*;
 import java.security.SecureRandom;
 
 public class WifiCredentialGenerator {
-    /*for MacOS   private static final File USER_FILE = new File("/Users/jaifha_wongkunta/Desktop/WifiSystem/wifi_user.txt"); */
-    /*for Windows*/ private static final File USER_FILE = new File("C:\\Users\\P\\Documents\\GitHub\\CafeWifiSystem\\wifi_user.txt");
+    private static final File USER_FILE = new File("");
 
     public static void main(String[] args) {
         String username = generateUsername(4);
@@ -32,8 +31,7 @@ public class WifiCredentialGenerator {
 
     private static void saveUser(String username, String password) {
         try {
-            /*for MacOS File directory = new File("/Users/jaifha_wongkunta/Desktop/WifiSystem"); */
-            /*for Windows*/ File directory = new File("C:\\\\Users\\\\P\\\\Documents\\\\GitHub\\\\CafeWifiSystem\\\\wifi_user.txt");
+            File directory = new File("");
             if (!directory.exists()) {
                 directory.mkdirs();
             }
